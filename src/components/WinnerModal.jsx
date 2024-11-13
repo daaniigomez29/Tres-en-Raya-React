@@ -1,10 +1,10 @@
 import { Square } from "./Square"
+import PropTypes from 'prop-types';
 
 export function WinnerModal ({ winner, resetGame }){
     if(winner === null) return null
     
     const winnerText = winner === false ? 'EMPATE' : 'GANÓ:'
-
 
     return(
             winner != null && (
@@ -22,4 +22,10 @@ export function WinnerModal ({ winner, resetGame }){
               </section>
             )
     )
+}
+
+// Validación de los props
+WinnerModal.propTypes = {
+  winner: PropTypes.node, // winner debe ser cualquier elemento renderizable
+  resetGame: PropTypes.func // resetGame debe ser una función
 }

@@ -1,13 +1,23 @@
 import { useState } from 'react'
 import { WINNER_COMBOS, TURNS} from '../constants.js'
 import confetti from "canvas-confetti"
+import { saveGameToStorage, resetGameStorage } from './storage/index.js'
 
 export function useGameState() {
-  const [board, setBoard] = useState(Array(9).fill(null))
 
-  const [turn, setTurns] = useState(TURNS.X)
 
-  const [winner, setWinner] = useState(null) //NULL: NO GANADOR, TRUE: GANADOR, FALSE: EMPATE
+  const [board, setBoard] = useState(() => {
+    const boardFromStorage = window.localStorage.getItem('board')
+    return boardFromStorage ? JSON.parse(boardFromStorage) : Array(9).fill(null)
+    })
+
+  const [turn, setTurn] = useState(() => {
+    const turnFromStorage = window.localStorage.getItem('turn')
+    return turnFromStorage ?? TURNS.X
+  })
+
+  //NULL: NO GANADOR, TRUE: GANADOR, FALSE: EMPATE
+  const [winner, setWinner] = useState(null)
 
   const updateBoard = (index) => {
     //Si en la posición del tablero hay algo que no sea nulo o 
@@ -21,7 +31,11 @@ export function useGameState() {
     setBoard(newBoard)
 
     const newTurn = turn === TURNS.X ? TURNS.O : TURNS.X
-    setTurns(newTurn);
+    setTurn(newTurn);
+    saveGameToStorage({
+      board: newBoard,
+      turn: newTurn
+      })
 
     const newWinner = checkWinnerFrom(newBoard)
     if (newWinner) {
@@ -34,8 +48,9 @@ export function useGameState() {
 
   const resetGame = () => {
     setBoard(Array(9).fill(null))
-    setTurns(TURNS.X)
+    setTurn(TURNS.X)
     setWinner(null)
+    resetGameStorage()
   }
 
   const checkWinnerFrom = (boardToCheck) => {
